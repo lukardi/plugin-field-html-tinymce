@@ -8,7 +8,7 @@ import {
 } from '@nocobase/client';
 import { useField, useFieldSchema } from '@formily/react';
 import { defaultToolbar } from "../constant";
-import { Editor } from "../../../lib/tinymce/tinymce";
+import { Editor } from "../../../lib/tinymce_7.9.1/tinymce";
 import { EditorTinyMCE } from './EditorTinyMCE';
 
 export const HtmlBlockTinyMCE = (props) => {
