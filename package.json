@@ -1,0 +1,18 @@
+{
+  "name": "@lukardi/plugin-field-html-tinymce",
+  "displayName": "Lukardi: TinyMCE Field",
+  "version": "0.1.8",
+  "nocoVersions": [
+    "1.7.0",
+    "1.8.0"
+  ],
+  "main": "dist/server/index.js",
+  "dependencies": {
+    "@tinymce/tinymce-react": "^6.3.0"
+  },
+  "peerDependencies": {
+    "@nocobase/client": "1.x",
+    "@nocobase/server": "1.x",
+    "@nocobase/test": "1.x"
+  }
+}

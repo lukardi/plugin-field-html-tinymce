@@ -1,0 +1,7 @@
+.mce-content-body code,
+.mce-content-body pre {
+    background-color: rgba(222, 222, 222, 0.5);
+    border: solid 1px rgba(222, 222, 222, 0.5);
+    border-radius: 4px;
+    padding: 0 0.2em;
+}
