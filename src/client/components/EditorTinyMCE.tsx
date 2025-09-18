@@ -4,8 +4,9 @@ import {
 } from '@nocobase/client';
 import { Editor as EditorComponent } from '@tinymce/tinymce-react';
 import { Editor } from "../../../lib/tinymce_7.9.1/tinymce";
-import { defaultToolbar, ResourceName, toolbarList, toolbarMap } from "../constant";
+import { defaultToolbar, RESOURCE_NAME, toolbarList, toolbarMap } from "../constant";
 import { FilePicker, FilePickerProps } from './FilePicker';
+import { URL_PUBLIC_LIB } from "../constants";
 
 function reactElementTextContent(element: React.ReactElement): string {
     if (React.isValidElement(element)) {
@@ -65,7 +66,7 @@ export const EditorTinyMCE = (props: {
     }, []);
 
     const handlerUpload = useCallback((blobInfo: { blob(): File }, progress) => new Promise((resolve, reject) => {
-        apiClient.resource(ResourceName).check({
+        apiClient.resource(RESOURCE_NAME).check({
             fileCollectionName: fileCollection,
         }).then(({ data: checkData }) => {
             if (!checkData?.data?.isSupportToUploadFiles) {
@@ -294,7 +295,7 @@ export const EditorTinyMCE = (props: {
     return <>
         <EditorComponent
             key={'editor'}
-            tinymceScriptSrc='/static/plugins/@lukardi/plugin-field-html-tinymce/lib/tinymce_7.9.1/tinymce.min.js'
+            tinymceScriptSrc={`${URL_PUBLIC_LIB}tinymce_7.9.1/tinymce.min.js`}
             onInit={(event, editor: Editor) => {
                 editorRef.current = editor;
                 if (props.editorRef) props.editorRef.current = editor;

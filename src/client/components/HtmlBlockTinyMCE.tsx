@@ -10,6 +10,7 @@ import { useField, useFieldSchema } from '@formily/react';
 import { defaultToolbar } from "../constant";
 import { Editor } from "../../../lib/tinymce_7.9.1/tinymce";
 import { EditorTinyMCE } from './EditorTinyMCE';
+import { URL_PUBLIC_LIB } from "../constants";
 
 export const HtmlBlockTinyMCE = (props) => {
     const { content = '' } = props;
@@ -101,7 +102,7 @@ export const HtmlBlockTinyMCE = (props) => {
                     init={{
                         save_enablewhendirty: true,
                         save_onsavecallback: handlerSave,
-                        content_css: '/static/plugins/@lukardi/plugin-field-html-tinymce/lib/tinymce-block-edit.css'
+                        content_css: `${URL_PUBLIC_LIB}tinymce-block-edit.css`
                     }}
                     onChange={() => null}
                     scope={variableOptions || []}

@@ -1,5 +1,5 @@
 //@ts-ignore
-import pkg from "../package.json";
+import pkg from "../../package.json";
 import { TFuncKey, TOptions } from 'i18next';
 
 export function tval(text: TFuncKey | TFuncKey[], options?: TOptions) {
@@ -14,4 +14,4 @@ export const NAMESPACE_BLOCK_STORAGE = `${NAMESPACE}-block.html-storage`;
 export function generateNTemplate(key: string) {
   return tval(key, { ns: NAMESPACE })
 }
-export const ResourceName = 'tinymce';
+export const RESOURCE_NAME = 'tinymce';

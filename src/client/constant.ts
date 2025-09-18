@@ -1,4 +1,4 @@
-export * from '../constant';
+export * from '../server/constant';
 
 export const toolbarList: {
     key: string,

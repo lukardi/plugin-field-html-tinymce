@@ -12,6 +12,7 @@ import { PicRightOutlined } from '@ant-design/icons';
 import { useField } from '@formily/react';
 import { EditorTinyMCE } from './components/EditorTinyMCE';
 import { HtmlBlockTinyMCE } from './components/HtmlBlockTinyMCE';
+import { URL_PUBLIC_LIB } from "./constants";
 
 export class PluginFieldHtmlTinymceClient extends Plugin {
   async load() {
@@ -158,7 +159,7 @@ export class PluginFieldHtmlTinymceClient extends Plugin {
           {
             id: 'tinymce-block-styles',
             rel: 'stylesheet',
-            href: '/static/plugins/@lukardi/plugin-field-html-tinymce/lib/tinymce-block.css?rand='+Date.now()
+            href: `${URL_PUBLIC_LIB}tinymce-block.css?rand=${Date.now()}`
           }
         ));
       }
