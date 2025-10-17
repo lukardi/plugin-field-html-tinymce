@@ -9,7 +9,7 @@
 
 import { ISchema } from '@formily/react';
 import { CollectionFieldInterface, interfacesProperties } from '@nocobase/client';
-import { defaultToolbar, generateNTemplate, toolbarList } from './constant';
+import { defaultToolbar, generateNTemplate as generateTemplate, toolbarList } from './constants';
 
 const { defaultProps, operators } = interfacesProperties;
 
@@ -18,7 +18,7 @@ export class HtmlTinyMceFieldInterface extends CollectionFieldInterface {
   type = 'object';
   group = 'media';
   order = 1;
-  title = generateNTemplate('TinyMCE');
+  title = generateTemplate('TinyMCE');
   sortable = true;
   default = {
     type: 'text',
@@ -33,7 +33,7 @@ export class HtmlTinyMceFieldInterface extends CollectionFieldInterface {
     ...defaultProps,
     'uiSchema.x-component-props.fileCollection': {
       type: 'string',
-      title: generateNTemplate('File collection'),
+      title: generateTemplate('File collection'),
       'x-component': 'CollectionSelect',
       'x-component-props': { filter: (collection) => collection?.options?.template === 'file' },
       'x-decorator': 'FormItem',
@@ -41,16 +41,30 @@ export class HtmlTinyMceFieldInterface extends CollectionFieldInterface {
       'x-reactions': {
         fulfill: {
           schema: {
-            description: generateNTemplate(
+            description: generateTemplate(
               'Used to store files uploaded in the Markdown editor (default: attachments)',
             ),
           },
         },
       },
     },
+    'uiSchema.x-component-props.height': {
+      type: 'string',
+      title: generateTemplate('Height'),
+      'x-component': 'Input',
+      'x-decorator': 'FormItem',
+      default: '500px',
+      'x-reactions': {
+        fulfill: {
+          schema: {
+            description: `Example: 100px, 300px, 11em, 20vh`
+          },
+        },
+      },
+    },
     'uiSchema.x-component-props.toolbar': {
       type: 'string',
-      title: generateNTemplate('Toolbar'),
+      title: generateTemplate('Toolbar'),
       'x-component': 'Input.TextArea',
       'x-decorator': 'FormItem',
       default: defaultToolbar,

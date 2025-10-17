@@ -4,7 +4,7 @@ import {
 } from '@nocobase/client';
 import { Editor as EditorComponent } from '@tinymce/tinymce-react';
 import { Editor } from "../../../lib/tinymce_7.9.1/tinymce";
-import { defaultToolbar, RESOURCE_NAME, toolbarList, toolbarMap } from "../constant";
+import { defaultFormats, defaultToolbar, RESOURCE_NAME, toolbarList, toolbarMap } from "../constants";
 import { FilePicker, FilePickerProps } from './FilePicker';
 import { URL_PUBLIC_LIB } from "../constants";
 
@@ -24,6 +24,7 @@ function reactElementTextContent(element: React.ReactElement): string {
 export const EditorTinyMCE = (props: {
     fileCollection?: string,
     inline?: boolean,
+    height?: string,
     toolbar: string,
     apiKey?: string,
     value?: string,
@@ -57,6 +58,7 @@ export const EditorTinyMCE = (props: {
             fileCollection,
             selectFile: (newUrl: string) => {
                 cb(newUrl);
+                console.log('newUrl', newUrl);
                 setFilePickerProps({ active: false });
             },
             onClose: () => {
@@ -279,13 +281,42 @@ export const EditorTinyMCE = (props: {
         return <div className="mce-content-body" dangerouslySetInnerHTML={{ __html: value }} />
     }
 
+    const genFormat = (title, t, style) => {
+        return { title, items: [
+            ...[0, 0.25, 0.5, 1, 1.5, 3].map((e, i) => (
+                { title: `${t}-${i}`, selector: '*', styles: { [style]: e+'em' } }
+            )),
+        ] };
+    };
+
     const initProps = {
-        height: 500,
+        height: props.height || '500px',
         language: 'pl',
         menubar: true,
         plugins: initPropPlugins,
         setup: editorSetup,
         toolbar: `${ variableOptions ? 'nocobaseVariables | ' : '' }${toolbar}`.split("\n"),
+        style_formats_merge: true,
+        style_formats: [
+            { title: 'Margin', items: [
+                genFormat('All', 'm', 'margin'),
+                genFormat('Top', 'mt', 'marginTop'),
+                genFormat('Left', 'ml', 'marginLeft'),
+                genFormat('Right', 'mr', 'marginRight'),
+                genFormat('Bottom', 'mb', 'marginBottom'),
+                { title: 'Special', items: [
+                    { title: `mx-auto`, selector: '*', styles: { marginLeft: 'auto', marginRight: 'auto' } },
+                ] }
+            ] },
+            { title: 'Padding', items: [
+                genFormat('All', 'p', 'padding'),
+                genFormat('Top', 'pt', 'paddingTop'),
+                genFormat('Left', 'pl', 'paddingLeft'),
+                genFormat('Right', 'pr', 'paddingRight'),
+                genFormat('Bottom', 'pb', 'paddingBottom'),
+            ] },
+        ],
+        relative_urls: false,
         images_upload_base_path: '/',
         file_picker_callback: handlerFilePicker,
         images_upload_handler: handlerUpload,

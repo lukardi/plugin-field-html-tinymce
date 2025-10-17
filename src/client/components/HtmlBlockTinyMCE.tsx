@@ -7,7 +7,7 @@ import {
   useVariableOptions, useCollectionRecord, replaceVariableValue
 } from '@nocobase/client';
 import { useField, useFieldSchema } from '@formily/react';
-import { defaultToolbar } from "../constant";
+import { defaultToolbar } from "../constants";
 import { Editor } from "../../../lib/tinymce_7.9.1/tinymce";
 import { EditorTinyMCE } from './EditorTinyMCE';
 import { URL_PUBLIC_LIB } from "../constants";

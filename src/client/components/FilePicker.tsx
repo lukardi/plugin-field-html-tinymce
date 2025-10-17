@@ -12,14 +12,14 @@ export type FilePickerProps = {
 };
 
 export const FilePicker = (props: FilePickerProps) => {
-    const { fileCollection = 'attachments', selectFile, onClose } = props;
+    const { fileCollection, selectFile, onClose } = props;
     const [state, setStateRaw] = useState({
         hidden: true,
         open: false,
     });
     const setState = (data) => setStateRaw({ ...setState, ...data });
     const { data: dataSet } = useRequest< { data: { id: number }[] } >({
-        resource: fileCollection,
+        resource: fileCollection || 'attachments',
         action: 'list',
         params: {
             pageSize: 20,
