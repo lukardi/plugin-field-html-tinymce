@@ -58,7 +58,6 @@ export const EditorTinyMCE = (props: {
             fileCollection,
             selectFile: (newUrl: string) => {
                 cb(newUrl);
-                console.log('newUrl', newUrl);
                 setFilePickerProps({ active: false });
             },
             onClose: () => {
@@ -318,6 +317,7 @@ export const EditorTinyMCE = (props: {
         ],
         relative_urls: false,
         images_upload_base_path: '/',
+        file_picker_types: 'file image media',
         file_picker_callback: handlerFilePicker,
         images_upload_handler: handlerUpload,
         ...init,

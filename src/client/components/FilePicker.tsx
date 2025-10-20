@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button, Drawer, Table } from 'antd';
-import { useRequest } from "@nocobase/client";
+import { UploadOutlined } from '@ant-design/icons';
+import { Upload, useRequest } from "@nocobase/client";
 
 const DrawerCloseAnimationTime = 200;
 
@@ -12,14 +13,15 @@ export type FilePickerProps = {
 };
 
 export const FilePicker = (props: FilePickerProps) => {
-    const { fileCollection, selectFile, onClose } = props;
+    const { selectFile, onClose } = props;
+    const fileCollection = props.fileCollection || 'attachments';
     const [state, setStateRaw] = useState({
         hidden: true,
         open: false,
     });
     const setState = (data) => setStateRaw({ ...setState, ...data });
-    const { data: dataSet } = useRequest< { data: { id: number }[] } >({
-        resource: fileCollection || 'attachments',
+    const { data: dataSet, refresh } = useRequest<{ data: { id: number }[] }>({
+        resource: fileCollection,
         action: 'list',
         params: {
             pageSize: 20,
@@ -42,6 +44,15 @@ export const FilePicker = (props: FilePickerProps) => {
             }}
         >
             <div>
+                <div style={{marginBottom: '1em'}}>
+                    <Upload.Attachment
+                        action={`${fileCollection}:create`}
+                        multiple={true}
+                        onChange={() => {
+                            refresh?.()
+                        }}
+                    />
+                </div>
                 <Table dataSource={(dataSet?.data ? (Array.isArray(dataSet.data) ? dataSet.data : [dataSet.data]) : [])} columns={[
                     {
                         title: 'File',
