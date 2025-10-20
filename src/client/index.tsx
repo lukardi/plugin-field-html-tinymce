@@ -16,6 +16,7 @@ import { URL_PUBLIC_LIB } from "./constants";
 
 export class PluginFieldHtmlTinymceClient extends Plugin {
   async load() {
+    console.log(this.app);
     this.loadFieldEditor();
     this.loadDesignBlock();
   }
@@ -30,34 +31,27 @@ export class PluginFieldHtmlTinymceClient extends Plugin {
 
   loadDesignBlock() {
     const addMenuItemToAddBlockMenus = () => {
-      const blockInitializers = this.app.schemaInitializerManager.get('page:addBlock');
-      blockInitializers?.add('otherBlocks.htmlTinyMCE', {
-        title: '{{t("htmlTinyMCE")}}',
-        Component: 'HtmlBlockTinyMCEInitializer',
-      });
-      const formInitializers = this.app.schemaInitializerManager.get('form:configureFields');
-      formInitializers?.add('addHtml', {
-        title: '{{t("htmlTinyMCE")}}',
-        Component: 'HtmlBlockTinyMCEInitializer',
-      });
+      for (let instance of [
+        "bulkEditForm:configureFields", "details:configureFields", "filterForm:configureFields", 'form:configureFields',
+      ]) {
+        const formInitializers = this.app.schemaInitializerManager.get(instance);
+        formInitializers?.add('addHtml', {
+          title: '{{t("htmlTinyMCE")}}',
+          Component: 'HtmlBlockTinyMCEInitializer',
+        });
+      }
 
-      const createFormBlockInitializers = this.app.schemaInitializerManager.get('popup:addNew:addBlock');
-      createFormBlockInitializers?.add('otherBlocks.htmlTinyMCE', {
-        title: '{{t("htmlTinyMCE")}}',
-        Component: 'HtmlBlockTinyMCEInitializer',
-      });
-
-      const recordBlockInitializers = this.app.schemaInitializerManager.get('popup:common:addBlock');
-      recordBlockInitializers?.add('otherBlocks.htmlTinyMCE', {
-        title: '{{t("htmlTinyMCE")}}',
-        Component: 'HtmlBlockTinyMCEInitializer',
-      });
-
-      const recordFormBlockInitializers = this.app.schemaInitializerManager.get('RecordFormBlockInitializers');
-      recordFormBlockInitializers?.add('otherBlocks.htmlTinyMCE', {
-        title: '{{t("htmlTinyMCE")}}',
-        Component: 'HtmlBlockTinyMCEInitializer',
-      });
+      for (let instance of [
+        'page:addBlock',
+        'popup:addNew:addBlock', "popup:addRecord:addBlock", "popup:common:addBlock", "popup:bulkEdit:addBlock", 'popup:tableSelector:addBlock',
+        'RecordFormBlockInitializers'
+      ]) {
+        const createFormBlockInitializers = this.app.schemaInitializerManager.get(instance);
+        createFormBlockInitializers?.add('otherBlocks.htmlTinyMCE', {
+          title: '{{t("htmlTinyMCE")}}',
+          Component: 'HtmlBlockTinyMCEInitializer',
+        });
+      }
 
       this.app.schemaInitializerManager.addItem('mobilePage:addBlock', 'otherBlocks.htmlTinyMCE', {
         title: '{{t("htmlTinyMCE")}}',

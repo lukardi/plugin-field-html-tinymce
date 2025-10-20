@@ -1,7 +1,7 @@
 {
   "name": "@lukardi/plugin-field-html-tinymce",
   "displayName": "Lukardi: TinyMCE Field",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "nocoVersions": [
     "1.7.0",
     "1.8.0"
