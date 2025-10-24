@@ -4,7 +4,8 @@ import {
   useBlockHeight, useDesignable,
   useLocalVariables,
   useVariables,
-  useVariableOptions, useCollectionRecord, replaceVariableValue
+  useVariableOptions, useCollectionRecord,
+  getRenderContent
 } from '@nocobase/client';
 import { useField, useFieldSchema } from '@formily/react';
 import { defaultToolbar } from "../constants";
@@ -40,7 +41,9 @@ export const HtmlBlockTinyMCE = (props) => {
         (async () => {
             setState({ loading: true });
             try {
-                setValuePreview(await replaceVariableValue(valueRaw, variables, localVariables));
+                const nullParser = (c) => c;
+                const content = await getRenderContent('handlebars', valueRaw, variables, localVariables, nullParser);
+                setValuePreview(content);
             } catch (error) {
                 setValuePreview(error.message);
             } finally {

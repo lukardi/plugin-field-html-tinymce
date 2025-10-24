@@ -21,7 +21,7 @@ export class PluginFieldHtmlTinymceServer extends Plugin {
       fs.rm(DIR_LINK, { force: true });
     } else {
       // symlink @/dist/client/lib -> @/lib
-      try { fs.symlink(DIR_LIB, DIR_LINK, 'dir'); }
+      try { await fs.symlink(DIR_LIB, DIR_LINK, 'dir'); }
       catch (error) {
         if (error.code !== 'EEXIST') throw error;
       }

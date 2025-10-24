@@ -294,6 +294,9 @@ export const EditorTinyMCE = (props: {
         menubar: true,
         plugins: initPropPlugins,
         setup: editorSetup,
+        protect: [
+            /<!--[\s\S]*?-->/g,
+        ],
         toolbar: `${ variableOptions ? 'nocobaseVariables | ' : '' }${toolbar}`.split("\n"),
         style_formats_merge: true,
         style_formats: [
