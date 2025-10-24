@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button, Drawer, Table } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { useForm as useFormFormily } from '@formily/react';
+import { FieldContext } from '@formily/react';
 import { Upload, useRequest } from "@nocobase/client";
 
 const DrawerCloseAnimationTime = 200;
@@ -27,6 +28,10 @@ export const FilePicker = (props: FilePickerProps) => {
             pageSize: 20,
         },
     });
+    const form = useFormFormily();
+    const uploadFormField = useMemo(() => {
+        return form.createObjectField({ name: `uploader` });
+    }, []);
 
     useEffect(() => {
         setState({ hidden: false, open: true });
@@ -45,13 +50,15 @@ export const FilePicker = (props: FilePickerProps) => {
         >
             <div>
                 <div style={{marginBottom: '1em'}}>
-                    <Upload.Attachment
-                        action={`${fileCollection}:create`}
-                        multiple={true}
-                        onChange={() => {
-                            refresh?.()
-                        }}
-                    />
+                    <FieldContext.Provider value={uploadFormField}>
+                        <Upload.Attachment
+                            action={`${fileCollection}:create`}
+                            multiple={true}
+                            onChange={() => {
+                                refresh?.()
+                            }}
+                        />
+                    </FieldContext.Provider>
                 </div>
                 <Table dataSource={(dataSet?.data ? (Array.isArray(dataSet.data) ? dataSet.data : [dataSet.data]) : [])} columns={[
                     {
