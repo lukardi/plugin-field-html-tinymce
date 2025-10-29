@@ -9,9 +9,10 @@ import {
 } from '@nocobase/client';
 import { useField, useFieldSchema } from '@formily/react';
 import { defaultToolbar } from "../constants";
-import { Editor } from "../../../lib/tinymce_7.9.1/tinymce";
 import { EditorTinyMCE } from './EditorTinyMCE';
 import { URL_PUBLIC_LIB } from "../constants";
+import { Editor } from "tinymce";
+import { wrappedContent } from "../utils";
 
 export const HtmlBlockTinyMCE = (props) => {
     const { content = '' } = props;
@@ -41,7 +42,7 @@ export const HtmlBlockTinyMCE = (props) => {
         (async () => {
             setState({ loading: true });
             try {
-                const nullParser = (c) => c;
+                const nullParser = (content) => content;
                 const content = await getRenderContent('handlebars', valueRaw, variables, localVariables, nullParser);
                 setValuePreview(content);
             } catch (error) {
@@ -58,7 +59,11 @@ export const HtmlBlockTinyMCE = (props) => {
     const saveContent = useCallback(() => {
         if (!refEditor.current) return;
 
-        const valueRaw = refEditor.current.getContent();
+        const editor = refEditor.current;
+        const valueRaw = wrappedContent.create(
+            editor.getContent(),
+            editor.dom.getStyle(editor.getBody(), 'padding')
+        );
 
         setValueRaw(valueRaw);
         schema['x-component-props'] ?? (schema['x-component-props'] = {});

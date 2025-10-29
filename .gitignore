@@ -1,2 +1,4 @@
 !lib
 dist
+src/client/lib/tinymce-7.9.1
+package-lock.json

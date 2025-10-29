@@ -3,28 +3,18 @@ import path from 'node:path';
 import { Plugin } from '@nocobase/server';
 import { NAMESPACE, RESOURCE_NAME } from './constant';
 import { Context, Next } from '@nocobase/actions';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
+
+const execPromise = promisify(exec);
 
 export class PluginFieldHtmlTinymceServer extends Plugin {
-  /**
-  * Fix problem with nginx configuration
-  * see: nocobase/packages/core/cli/nocobase.conf.tpl
-  *
-  * Create access to /static/plugins/@lukardi/plugin-field-html-tinymce/dist/client/lib/*
-  */
-  async createPublicLocation() {
-    const DIR_PLUGIN_ROOT = path.join(__dirname, '../..');
-    const DIR_DIST_CLIENT = path.join(DIR_PLUGIN_ROOT, 'dist/client');
-    const DIR_LIB = path.join(DIR_PLUGIN_ROOT, 'lib');
-    const DIR_LINK = path.join(DIR_DIST_CLIENT, 'lib');
+  async getTiny() {
+    const DIR_TINY = path.join(__dirname, '../client/lib/tinymce-7.9.1');
+    const npmTinyUrl = 'https://registry.npmjs.org/tinymce/-/tinymce-7.9.1.tgz';
 
-    if (process.env.IS_DEV_CMD) {
-      fs.rm(DIR_LINK, { force: true });
-    } else {
-      // symlink @/dist/client/lib -> @/lib
-      try { await fs.symlink(DIR_LIB, DIR_LINK, 'dir'); }
-      catch (error) {
-        if (error.code !== 'EEXIST') throw error;
-      }
+    try { await fs.stat(DIR_TINY); } catch (error) {
+      await execPromise(`wget -qO- ${npmTinyUrl} | tar -xz && mv package ${DIR_TINY}`);
     }
   }
 
@@ -90,7 +80,7 @@ export class PluginFieldHtmlTinymceServer extends Plugin {
   }
 
   async load() {
-    await this.createPublicLocation();
+    await this.getTiny();
     await this.createResource();
   }
 }

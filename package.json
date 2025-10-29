@@ -1,14 +1,15 @@
 {
   "name": "@lukardi/plugin-field-html-tinymce",
   "displayName": "Lukardi: TinyMCE Field",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "nocoVersions": [
     "1.7.0",
     "1.8.0"
   ],
   "main": "dist/server/index.js",
-  "dependencies": {
-    "@tinymce/tinymce-react": "^6.3.0"
+  "devDependencies": {
+    "@tinymce/tinymce-react": "^6.3.0",
+    "tinymce": "^7.9.1"
   },
   "peerDependencies": {
     "@nocobase/client": "1.x",

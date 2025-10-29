@@ -13,10 +13,13 @@ import { useField } from '@formily/react';
 import { EditorTinyMCE } from './components/EditorTinyMCE';
 import { HtmlBlockTinyMCE } from './components/HtmlBlockTinyMCE';
 import { URL_PUBLIC_LIB } from "./constants";
+//@ts-ignore
+import tinyPkg from 'tinymce/package.json';
+
+tinyPkg.version;
 
 export class PluginFieldHtmlTinymceClient extends Plugin {
   async load() {
-    console.log(this.app);
     this.loadFieldEditor();
     this.loadDesignBlock();
   }
