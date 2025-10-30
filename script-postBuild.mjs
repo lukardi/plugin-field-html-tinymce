@@ -14,4 +14,8 @@ const execPromise = promisify(exec);
     console.log(`✏️ copy "lib" directory`);
 
     await execPromise(`cp -r ${DIR_LIB_SRC} ${DIR_LIB_DEST}`);
+
+    try {
+        await execPromise(`rm -fr ${DIR_LIB_DEST}/tinymce-7.9.1`);
+    } catch (error) {}
 })();
