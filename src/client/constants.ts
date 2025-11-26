@@ -96,6 +96,7 @@ export const defaultMenu = {
   help: { title: 'Help', items: 'help' }
 };
 
-export const URL_PUBLIC_LIB = global._?.name === 'lodash'
+export const isDev = () => global._?.name === 'lodash';
+export const URL_PUBLIC_LIB = isDev()
   ? '/static/plugins/@lukardi/plugin-field-html-tinymce/src/client/lib/'
   : '/static/plugins/@lukardi/plugin-field-html-tinymce/dist/client/lib/';

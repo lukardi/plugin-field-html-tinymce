@@ -5,9 +5,11 @@ import {
 import { Editor as EditorComponent } from '@tinymce/tinymce-react';
 import { defaultMenu, defaultToolbar, RESOURCE_NAME, toolbarList, toolbarMap } from "../constants";
 import { FilePicker, FilePickerProps } from './FilePicker';
-import { URL_PUBLIC_LIB } from "../constants";
+import { URL_PUBLIC_LIB, isDev } from "../constants";
 import { Editor, TinyMCE } from "tinymce";
 import { wrappedContent } from "../utils";
+
+const DEBUG = isDev();
 
 function reactElementTextContent(element: React.ReactElement): string {
     if (React.isValidElement(element)) {
@@ -50,11 +52,19 @@ export const EditorTinyMCE = (props: {
     //#region Handlers
 
     const handlerContantChange = (content: string, editor: Editor) => {
-        if (onChange) {
-            const padding = editor.dom.getStyle(editor.getBody(), 'padding');
-            const newContent = wrappedContent.create(content, padding);
+        if (DEBUG) console.log(`EditorTinyMCE: handlerContantChange`, content);
 
-            onChange(newContent);
+        if (onChange) {
+            const { padding } = wrappedContent.extract(content);
+
+            if (!padding) {
+                const currentPadding = editor.dom.getStyle(editor.getBody(), 'padding');
+                const newContent = wrappedContent.create(content, currentPadding);
+
+                if (value !== newContent) {
+                    onChange(newContent);
+                }
+            }
         }
     };
 
@@ -63,6 +73,8 @@ export const EditorTinyMCE = (props: {
         currentUrl: string,
         meta: { fieldname: string, fieldtype: string }
     ) => {
+        if (DEBUG) console.log(`EditorTinyMCE: handlerFilePicker`);
+
         setFilePickerProps({
             active: true,
             fileCollection,
@@ -77,6 +89,8 @@ export const EditorTinyMCE = (props: {
     }, []);
 
     const handlerUpload: Parameters<TinyMCE['init']>[0]['images_upload_handler'] = useCallback((blobInfo, progress) => new Promise((resolve, reject) => {
+        if (DEBUG) console.log(`EditorTinyMCE: handlerUpload`);
+    
         apiClient.resource(RESOURCE_NAME).check({
             fileCollectionName: fileCollection,
         }).then(({ data: checkData }) => {
@@ -133,6 +147,8 @@ export const EditorTinyMCE = (props: {
     //#region Setup
 
     const initPropPlugins = useMemo(() => {
+        if (DEBUG) console.log(`EditorTinyMCE: initPropPlugins`);
+
         const listOfPlugins = toolbar
             .match(/\w+/g)                                                    // split
             .map(item => toolbarMap[item]?.plugin)                            // get plugin name
@@ -144,22 +160,31 @@ export const EditorTinyMCE = (props: {
     }, [toolbar]);
 
     const editorSetup = useCallback((editor: Editor) => {
+        if (DEBUG) console.log(`EditorTinyMCE: editorSetup`);
+
         toolbarList.forEach((item) => {
             if (item.setup) item.setup(editor);
         });
 
-        if (init.setup) init.setup(editor);
+        if (init.setup) {
+            if (DEBUG) console.log(`EditorTinyMCE: editorSetup: external setup`);
+            init.setup(editor);
+        };
+
         if (variableOptions) {
+            if (DEBUG) console.log(`EditorTinyMCE: editorSetup: setup variableOptions`, variableOptions);
+
             class VariableItem {
                 // Label, key
 
+                value: string;
                 key: string;
                 label: any;
                 disabled?: boolean;
                 _label: string;
 
                 getId() { return `nocoVar[${this.getPathKey()}]`; }
-                getKey() { return this.key; }
+                getKey() { return this.value; }
                 getPathKey() {
                     return (this._parent ? this._parent.getPathKey() + '.' : '') + this.getKey();
                 }
@@ -301,6 +326,8 @@ export const EditorTinyMCE = (props: {
     //#endregion
 
     if (ellipsis || disabled) {
+        if (DEBUG) console.log(`EditorTinyMCE: render content`);
+
         return <div className="mce-content-body" dangerouslySetInnerHTML={{ __html: value }} />
     }
 
@@ -354,42 +381,62 @@ export const EditorTinyMCE = (props: {
                 ]
             },
         ],
+        // url
+        convert_urls: false,
         relative_urls: false,
+        // upload
         images_upload_base_path: '/',
         file_picker_types: 'file image media',
         file_picker_callback: handlerFilePicker,
         images_upload_handler: handlerUpload,
+        // override
         ...init,
     };
+
+    if (DEBUG) console.log(`EditorTinyMCE: render editor`);
 
     return <>
         <EditorComponent
             key={'editor'}
+            licenseKey={'gpl'}
+            // Resoureces
             tinymceScriptSrc={[
                 `${URL_PUBLIC_LIB}tinymce-7.9.1/tinymce.min.js`,
                 `${URL_PUBLIC_LIB}langs-7.9.1/pl.js`
             ]}
+            // Setup
+            init={initProps}
             onInit={(event, editor) => {
+                if (DEBUG) console.log(`EditorTinyMCE: onInit <EditorComponent />`);
+
+                // Set Resfs
                 editorRef.current = editor;
                 if (props.editorRef) props.editorRef.current = editor;
 
-                const rawContent = value || initialValue;
+                const initialContent = editor.getContent();
 
-                if (rawContent) {
-                    const { content, padding } = wrappedContent.extract(rawContent);
+                if (DEBUG) console.log(`EditorTinyMCE: initialContent`, initialContent);
 
-                    setTimeout(() => {
+                // Fix content
+                if (initialContent) {
+                    const { content, padding } = wrappedContent.extract(initialContent);
+                    
+                    if (DEBUG) console.log(`EditorTinyMCE: parse initialContent`, content, padding);
+
+                    if (content && padding) setTimeout(() => {
                         editor.dom.setStyle(editor.getBody(), 'padding', padding);
                         editor.setContent(content);
                     });
                 }
             }}
+            // Value
+            value={value}
+            initialValue={initialValue}
+            onEditorChange={handlerContantChange}
+            // Mode
             disabled={disabled}
             readonly={readOnly}
             inline={inline}
-            licenseKey={'gpl'}
-            init={initProps}
-            onEditorChange={handlerContantChange}
         />
         {filePickerProps.active ? <FilePicker key={'filepicker'} {...filePickerProps} /> : null}
         {inline ? <style key={'inline-style'}>{`.tox.tox-tinymce-inline { z-index: 100 }`}</style> : null}

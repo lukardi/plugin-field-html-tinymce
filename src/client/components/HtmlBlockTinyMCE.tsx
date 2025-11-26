@@ -4,7 +4,7 @@ import {
   useBlockHeight, useDesignable,
   useLocalVariables,
   useVariables,
-  useVariableOptions, useCollectionRecord,
+  useVariableOptions, useCollectionRecord, replaceVariableValue,
   getRenderContent
 } from '@nocobase/client';
 import { useField, useFieldSchema } from '@formily/react';
@@ -42,16 +42,21 @@ export const HtmlBlockTinyMCE = (props) => {
         (async () => {
             setState({ loading: true });
             try {
-                const nullParser = (content) => content;
-                const content = await getRenderContent('handlebars', valueRaw, variables, localVariables, nullParser);
-                setValuePreview(content);
+                if (schema['x-decorator-props']['engine'] === "handlebars") {
+                    // https://handlebarsjs.com/guide/expressions.html#path-expressions
+                    const nullParser = (content) => content;
+                    const content = await getRenderContent('handlebars', valueRaw, variables, localVariables, nullParser);
+                    setValuePreview(content);
+                } else {
+                    setValuePreview(await replaceVariableValue(valueRaw, variables, localVariables));
+                }
             } catch (error) {
                 setValuePreview(error.message);
             } finally {
                 setState({ loading: false });
             }
         })();
-    }, [valueRaw]);
+    }, [valueRaw, schema]);
 
     //#endregion
     //#region Handlers

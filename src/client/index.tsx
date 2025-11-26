@@ -5,6 +5,8 @@ import {
   SchemaSettingsBlockHeightItem,
   useSchemaInitializer, useSchemaInitializerItem,
   useDesignable,
+  CompatibleSchemaInitializer,
+  SchemaSettingsRenderEngine
 } from '@nocobase/client';
 import { useTranslation } from 'react-i18next';
 import { HtmlTinyMceFieldInterface } from './HtmlTinyMceFieldInterface';
@@ -21,7 +23,9 @@ tinyPkg.version;
 export class PluginFieldHtmlTinymceClient extends Plugin {
   async load() {
     this.loadFieldEditor();
-    this.loadDesignBlock();
+    setTimeout(() => {
+      this.loadDesignBlock();
+    });
   }
 
   loadFieldEditor() {
@@ -34,39 +38,39 @@ export class PluginFieldHtmlTinymceClient extends Plugin {
 
   loadDesignBlock() {
     const addMenuItemToAddBlockMenus = () => {
-      for (let instance of [
-        "bulkEditForm:configureFields", "details:configureFields", "filterForm:configureFields", 'form:configureFields',
-      ]) {
-        const formInitializers = this.app.schemaInitializerManager.get(instance);
-        formInitializers?.add('addHtml', {
+      for (let item of [].concat(...Object.values(this.app.schemaInitializerManager['schemaInitializers']).map((CSI) => CSI.options.items.map((item) => {
+        if (
+          ['otherBlocks', 'others'].includes(item.name)
+          && item.type === 'itemGroup'
+          && Array.isArray(item.children)
+        ) {
+            return { CSI, key: `${item.name}.htmlTinyMCE` };
+        }
+
+        if (!item.Component) return;
+
+        const name = item.Component.name?.toString() || item.Component.toString();
+
+        try {
+          if (
+            name.includes('MarkDown')
+            || name.includes('Markdown')
+            || name.includes('markdown')
+            || item.schema?.['x-component']?.includes('Markdown')
+          ) {
+            return { CSI, key: 'htmlTinyMCE' };
+          }
+        } catch (error) {}
+        return false;
+      }).filter(v => v)).filter(v => v.length))) {
+        const CSI: CompatibleSchemaInitializer = item.CSI;
+        const key: string = item.key;
+
+        CSI.add(key, {
           title: '{{t("htmlTinyMCE")}}',
           Component: 'HtmlBlockTinyMCEInitializer',
         });
       }
-
-      for (let instance of [
-        'page:addBlock',
-        'popup:addNew:addBlock', "popup:addRecord:addBlock", "popup:common:addBlock", "popup:bulkEdit:addBlock", 'popup:tableSelector:addBlock',
-        'RecordFormBlockInitializers'
-      ]) {
-        const createFormBlockInitializers = this.app.schemaInitializerManager.get(instance);
-        createFormBlockInitializers?.add('otherBlocks.htmlTinyMCE', {
-          title: '{{t("htmlTinyMCE")}}',
-          Component: 'HtmlBlockTinyMCEInitializer',
-        });
-      }
-
-      this.app.schemaInitializerManager.addItem('mobilePage:addBlock', 'otherBlocks.htmlTinyMCE', {
-        title: '{{t("htmlTinyMCE")}}',
-        Component: 'HtmlBlockTinyMCEInitializer',
-      });
-
-      this.app.schemaInitializerManager.addItem('mobile:addBlock', 'otherBlocks.htmlTinyMCE', {
-        title: '{{t("htmlTinyMCE")}}',
-        Component: 'HtmlBlockTinyMCEInitializer',
-      });
-
-      this.app.schemaInitializerManager
     };
 
     const createBlockInitializer = () => {
@@ -132,6 +136,10 @@ export class PluginFieldHtmlTinymceClient extends Plugin {
             Component: SchemaSettingsBlockHeightItem,
           },
           {
+            name: 'setBlockTemplate',
+            Component: SchemaSettingsRenderEngine,
+          },
+          {
             name: 'delete',
             type: 'remove',
             useComponentProps() {
@@ -148,7 +156,7 @@ export class PluginFieldHtmlTinymceClient extends Plugin {
 
       this.app.schemaSettingsManager.add(HtmlBlockTinyMCESchemaSettings);
     };
-  
+
     const injectStyles = () => {
       if (!document.getElementById('tinymce-block-styles')) {
         document.head.appendChild(Object.assign(
