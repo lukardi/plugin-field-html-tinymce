@@ -1,0 +1,18 @@
+import * as path from 'node:path';
+import { promisify } from 'node:util';
+import { exec } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const execPromise = promisify(exec);
+
+(async () => {
+    const DIR_LIB_SRC = path.join(__dirname, 'src/client/lib');
+
+    console.log(`✏️ rm tiny from "lib" directory`);
+
+    try {
+        await execPromise(`rm -fr ${DIR_LIB_SRC}/tinymce-7.9.1`);
+    } catch (error) {}
+})();
